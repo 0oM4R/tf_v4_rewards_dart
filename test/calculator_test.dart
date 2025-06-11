@@ -9,12 +9,11 @@ void main() {
       tbHdd: 10,
       tbNetwork: 5,
       cpuPassmark: 10000,
+      uptimePercentage: 95.0,
     );
     
-    const uptimePercentage = 95.0;
-    
     test('calculateAnnualIncaRewards returns correct values', () {
-      final rewards = calculateAnnualIncaRewards(testNode, uptimePercentage);
+      final rewards = calculateAnnualIncaRewards(testNode);
       
       // Expected values with 95% uptime
       final expectedMemRewards = 32 * CertifiedRewards.MEM_PER_GB_MONTH * 12 * 0.95;
@@ -32,7 +31,7 @@ void main() {
     });
     
     test('calculateMonthlyIncaRewards returns correct values', () {
-      final rewards = calculateMonthlyIncaRewards(testNode, uptimePercentage);
+      final rewards = calculateMonthlyIncaRewards(testNode);
       
       // Expected values with 95% uptime
       final expectedMemRewards = 32 * CertifiedRewards.MEM_PER_GB_MONTH * 0.95;
@@ -94,6 +93,7 @@ void main() {
         tbSsd: MinRequirements.TB_SSD_COUNT,
         tbHdd: 0,
         tbNetwork: 0,
+        uptimePercentage: 95.0,
       );
       
       final invalidMemNode = NodeConfig(
@@ -101,6 +101,7 @@ void main() {
         tbSsd: MinRequirements.TB_SSD_COUNT,
         tbHdd: 0,
         tbNetwork: 0,
+        uptimePercentage: 95.0,
       );
       
       expect(validateNodeConfig(validNode).isValid, isTrue);
