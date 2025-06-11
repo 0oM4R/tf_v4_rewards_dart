@@ -1,4 +1,4 @@
-import 'package:dart_v4_rewards/dart_v4_rewards.dart';
+import 'package:tf_v4_rewards_dart/dart_v4_rewards.dart';
 import 'package:test/test.dart';
 
 void main() {

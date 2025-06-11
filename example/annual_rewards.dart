@@ -1,4 +1,5 @@
-import 'package:dart_v4_rewards/dart_v4_rewards.dart';
+import 'package:tf_v4_rewards_dart/dart_v4_rewards.dart';
+
 
 void main() {
   // Example node configuration
@@ -50,7 +51,8 @@ void main() {
   print('---------------------------------------------------');
 
   for (final price in incaPrices) {
-    final income = calculateIncomePerNode(annualRewards.totalIncaRewards, price);
+    final income =
+        calculateIncomePerNode(annualRewards.totalIncaRewards, price);
     print(
         '|  ${price.toStringAsFixed(2).padLeft(12)}€ | ${income.totalIncomeEur.toStringAsFixed(2).padLeft(15)}€ | ${income.farmerIncomeEur.toStringAsFixed(2).padLeft(16)}€ |');
   }

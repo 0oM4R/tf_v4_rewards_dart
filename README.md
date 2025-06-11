@@ -14,7 +14,7 @@ This library provides functionality for calculating INCA rewards based on node c
 ## Usage
 
 ```dart
-import 'package:dart_v4_rewards/dart_v4_rewards.dart';
+import 'package:tf_v4_rewards_dart/dart_v4_rewards.dart';
 
 void main() {
   // Create a node configuration
