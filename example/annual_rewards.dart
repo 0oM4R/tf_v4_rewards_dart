@@ -1,15 +1,14 @@
 import 'package:tf_v4_rewards_dart/dart_v4_rewards.dart';
 
-
 void main() {
   // Example node configuration
   final nodeConfig = NodeConfig(
-    gbMem: 32, // 32 GB Memory
-    tbSsd: 2, // 2 TB SSD storage
-    tbHdd: 10, // 10 TB HDD storage
-    tbNetwork: 5, // 5 TB Network capacity
-    uptimePercentage: 95.0, // 95% uptime
-  );
+      gbMem: 32, // 32 GB Memory
+      tbSsd: 2, // 2 TB SSD storage
+      tbHdd: 10, // 10 TB HDD storage
+      tbNetwork: 5, // 5 TB Network capacity
+      uptimePercentage: 95.0 // 95% uptime
+      );
 
   // Validate node configuration
   final validationResult = validateNodeConfig(nodeConfig);
