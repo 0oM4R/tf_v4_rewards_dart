@@ -1,0 +1,30 @@
+# Dart/Flutter related
+.dart_tool/
+.packages
+build/
+.idea/
+.vscode/
+*.iml
+pubspec.lock
+
+# Dart compilation files
+*.dart.js
+*.js_
+*.js.deps
+*.js.map
+
+# Coverage files
+coverage/
+.test_coverage.dart
+.coverage/
+*.lcov
+
+# Android/IntelliJ/iOS
+.flutter-plugins
+.flutter-plugins-dependencies
+**/ios/Flutter/.last_build_id
+.pub-cache/
+.pub/
+
+# macOS
+.DS_Store
