@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThreeFold Farming Rewards Flow</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #0a6ebd;
+        }
+        .chart-container {
+            position: relative;
+            margin: 20px 0;
+            height: 400px;
+        }
+        .timeline-container {
+            margin: 40px 0;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .distribution-diagram {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+        .distribution-box {
+            flex: 1;
+            padding: 15px;
+            margin: 0 10px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .farmer-box {
+            background-color: #c8e6c9;
+            border: 2px solid #4caf50;
+        }
+        .pool-box {
+            background-color: #bbdefb;
+            border: 2px solid #2196f3;
+        }
+        .tf-box {
+            background-color: #ffecb3;
+            border: 2px solid #ffc107;
+        }
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: #0a6ebd;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: -17px;
+            background-color: white;
+            border: 4px solid #0a6ebd;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .left {
+            left: 0;
+        }
+        .right {
+            left: 50%;
+        }
+        .right::after {
+            left: -16px;
+        }
+        .timeline-content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ThreeFold Farming Rewards Visualization</h1>
+        
+        <div class="card">
+            <h2>Certified Capacity Rewards Calculation</h2>
+            <div class="chart-container" style="height: 250px;">
+                <canvas id="capacityChart"></canvas>
+            </div>
+            <div style="margin-top: 20px; background-color: #e8f5e9; padding: 15px; border-radius: 8px;">
+                <h3>Certified Monthly Rewards Formula:</h3>
+                <ul>
+                    <li>GB Memory: 8.0 INCA per GB</li>
+                    <li>TB SSD: 31.5 INCA per TB</li>
+                    <li>TB HDD: 7.0 INCA per TB</li>
+                    <li>TB Network: 30.0 INCA per TB</li>
+                </ul>
+                <p><strong>Example:</strong> A node with 64GB mem, 4TB SSD, 16TB HDD, 1TB Network would earn approximately 960 INCA per month in certified rewards.</p>
+            </div>
+            
+            <div style="margin-top: 20px; background-color: #ffecb3; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107;">
+                <h3>⚠️ Uptime Percentage Impact</h3>
+                <p>All rewards are directly multiplied by the node's uptime percentage:</p>
+                <p style="font-family: monospace; background: #f5f5f5; padding: 10px;">
+                    final memIncaRewards = nodeConfig.gbMem * memRewardPerGbMonth * nodeConfig.uptimePercentage / 100;
+                </p>
+                <ul>
+                    <li><strong>Minimum required uptime:</strong> 90%</li>
+                    <li>A node with 95% uptime receives exactly 95% of potential rewards</li>
+                    <li>Nodes with less than 90% uptime receive <strong>zero rewards</strong></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Revenue Distribution Model (Utilization Revenue)</h2>
+            <div class="distribution-diagram">
+                <div class="distribution-box farmer-box">
+                    <h3>60%</h3>
+                    <p>Farmers</p>
+                    <p>Direct earnings from utilization</p>
+                </div>
+                <div class="distribution-box pool-box">
+                    <h3>20%</h3>
+                    <p>Farming Pool</p>
+                    <p>Support, SLAs, Management</p>
+                </div>
+                <div class="distribution-box tf-box">
+                    <h3>20%</h3>
+                    <p>ThreeFold/Guardians</p>
+                    <p>Validation & Grid services</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Important: Capacity vs. Utilization Rewards</h2>
+            <div style="display: flex; align-items: center; justify-content: center; margin: 20px 0;">
+                <div style="text-align: center; padding: 20px; border: 2px solid #4caf50; border-radius: 8px; max-width: 80%;">
+                    <h3>Farmers receive the HIGHER of:</h3>
+                    <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 20px;">
+                        <div style="padding: 15px; background-color: #c8e6c9; border-radius: 8px; width: 45%;">Certified Capacity Rewards</div>
+                        <div style="font-weight: bold; font-size: 24px;">OR</div>
+                        <div style="padding: 15px; background-color: #bbdefb; border-radius: 8px; width: 45%;">60% of Utilization Rewards</div>
+                    </div>
+                    <div style="margin-top: 20px; font-style: italic; color: #666;">
+                        Example: If capacity rewards would be 100 tokens, and utilization would generate 120 tokens (60% of total), 
+                        the farmer would receive 120 tokens (not 220).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Rewards Release Timeline</h2>
+            <div class="timeline-container">
+                <div class="timeline">
+                    <div class="timeline-item left">
+                        <div class="timeline-content">
+                            <h3>Month 1-18</h3>
+                            <p>Certified capacity rewards granted monthly</p>
+                            <p>All tokens remain locked in wallet</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item right">
+                        <div class="timeline-content">
+                            <h3>Unlocking Condition Met</h3>
+                            <p>Node reaches 40% utilization</p>
+                            <p>OR</p>
+                            <p>24 months from activation</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item left">
+                        <div class="timeline-content">
+                            <h3>Gradual Release</h3>
+                            <p>5% of locked tokens released per month</p>
+                            <p>Until all tokens are fully unlocked</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Projected INCA Rewards Value (EUR)</h2>
+            <div class="chart-container">
+                <canvas id="rewardsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Node Utilization Impact on Revenue</h2>
+            <div class="chart-container">
+                <canvas id="utilizationChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Farming Pool Value Proposition</h2>
+            <div class="chart-container">
+                <canvas id="poolValueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart for Capacity Rewards Calculation
+        const capacityCtx = document.getElementById('capacityChart').getContext('2d');
+        const capacityChart = new Chart(capacityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Memory (per GB)', 'SSD (per TB)', 'HDD (per TB)', 'Network (per TB)'],
+                datasets: [{
+                    label: 'INCA Tokens per Month',
+                    data: [8.0, 31.5, 7.0, 30.0],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'INCA Tokens'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Monthly Certified Capacity Reward Rates'
+                    }
+                }
+            }
+        });
+        
+        // Chart for INCA Rewards Value
+        const rewardsCtx = document.getElementById('rewardsChart').getContext('2d');
+        const rewardsChart = new Chart(rewardsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['0.1', '0.2', '0.3', '0.4', '0.6', '1.0'],
+                datasets: [{
+                    label: 'Year 1 Income (EUR)',
+                    data: [900, 1800, 2700, 3600, 5400, 9000],
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Extrapolated 5Y (EUR)',
+                    data: [4500, 9000, 13500, 18000, 27000, 45000],
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'INCA Price (EUR)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Income (EUR)'
+                        },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Projected Rewards Based on INCA Price'
+                    }
+                }
+            }
+        });
+
+        // Chart for Utilization Impact
+        const utilizationCtx = document.getElementById('utilizationChart').getContext('2d');
+        const utilizationChart = new Chart(utilizationCtx, {
+            type: 'line',
+            data: {
+                labels: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%'],
+                datasets: [{
+                    label: 'Token Unlock Time (Months)',
+                    data: [24, 24, 24, 20, 16, 12, 10, 8, 6, 4],
+                    fill: false,
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    tension: 0.1
+                }, {
+                    label: 'Monthly Income (Relative)',
+                    data: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+                    fill: false,
+                    backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Node Utilization %'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Value'
+                        },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Impact of Node Utilization'
+                    }
+                }
+            }
+        });
+
+        // Chart for Farming Pool Value
+        const poolCtx = document.getElementById('poolValueChart').getContext('2d');
+        const poolChart = new Chart(poolCtx, {
+            type: 'radar',
+            data: {
+                labels: ['SLA Management', 'Technical Support', 'Monitoring', 'Marketing', 'Node Sales', 'User Communication', 'Token Liquidity'],
+                datasets: [{
+                    label: 'Individual Farmer',
+                    data: [20, 30, 25, 10, 15, 20, 15],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    pointBackgroundColor: 'rgb(255, 99, 132)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(255, 99, 132)'
+                }, {
+                    label: 'Farming Pool',
+                    data: [85, 90, 95, 80, 75, 85, 65],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    pointBackgroundColor: 'rgb(54, 162, 235)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(54, 162, 235)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                elements: {
+                    line: {
+                        borderWidth: 3
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Value Added by Farming Pool vs Individual Farmer'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
